@@ -13,7 +13,7 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
-app.get('/talker', async function(_req, res) {
+app.get('/talker', async (_req, res) => {
   const talker = await fs.readFile('./talker.json', 'utf-8');
   res.status(200).json(JSON.parse(talker));
 });
