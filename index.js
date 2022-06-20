@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const crypto = require('crypto');
 
 const { readFileTalker } = require('./util/utils');
 
@@ -28,6 +29,11 @@ app.get('/talker', async (req, res) => {
   const talker = await readFileTalker('./talker.json');
   console.log(talker);
   res.status(200).json(talker);
+});
+
+app.post('/login', (req, res) => {
+  const token = crypto.randomBytes(8).toString('hex');
+  res.status(200).json({ token });
 });
 
 app.listen(PORT, () => {
