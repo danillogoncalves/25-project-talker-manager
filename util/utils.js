@@ -5,6 +5,12 @@ const readFileTalker = async (file) => {
   return JSON.parse(talker);
 };
 
+const writeFileTalker = async (file, object) => {
+  const string = JSON.stringify(object);
+  await fs.writeFile(file, string);
+};
+
 module.exports = {
   readFileTalker,
+  writeFileTalker,
 };

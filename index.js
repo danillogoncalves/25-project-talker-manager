@@ -2,9 +2,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const crypto = require('crypto');
 
-const { readFileTalker } = require('./util/utils');
+const { readFileTalker, writeFileTalker } = require('./util/utils');
 const { validateEmail } = require('./middlewares/validateEmail');
 const { validatePassword } = require('./middlewares/validatePassword');
+const { validateToken } = require('./middlewares/validateToken');
+const { validadeName } = require('./middlewares/validadeName');
+const { validateAge } = require('./middlewares/validateAge');
+const { validateTalk } = require('./middlewares/validateTalk');
+const { validateTalkWatchedAt } = require('./middlewares/validateTalkWatchedAt');
+const { validateTalkRate } = require('./middlewares/validateTalkRate');
 
 const app = express();
 app.use(bodyParser.json());
@@ -25,7 +31,7 @@ app.get('/talker/:id', async (req, res) => {
   res.status(200).json(talk);
 });
 
-app.get('/talker', async (req, res) => {
+app.get('/talker', async (_req, res) => {
   const talker = await readFileTalker('./talker.json');
   res.status(200).json(talker);
 });
@@ -34,6 +40,23 @@ app.post('/login', validateEmail, validatePassword, (req, res) => {
   const token = crypto.randomBytes(8).toString('hex');
   res.status(200).json({ token });
 });
+
+app.post(
+  '/talker',
+  validateToken,
+  validadeName,
+  validateAge,
+  validateTalk,
+  validateTalkWatchedAt,
+  validateTalkRate,
+  async (req, res) => {
+    const talker = await readFileTalker('./talker.json');
+    const newTalk = { ...req.body, id: talker.length + 1 };
+    const newList = [...talker, newTalk];
+    await writeFileTalker('./talker.json', newList);
+  res.status(201).json(newTalk);
+},
+);
 
 app.listen(PORT, () => {
   console.log('Online');
