@@ -26,9 +26,7 @@ app.get('/', (_request, response) => {
 
 app.get('/talker/search', validateToken, async (req, res) => {
   const { q } = req.query;
-  console.log(q);
   const talker = await readFileTalker(PATH);
-  console.log(talker[0].name);
   const searchName = talker.filter(({ name }) => name.includes(q));
   res.status(200).json(searchName);
 });
