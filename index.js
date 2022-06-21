@@ -24,6 +24,15 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.get('/talker/search', validateToken, async (req, res) => {
+  const { q } = req.query;
+  console.log(q);
+  const talker = await readFileTalker(PATH);
+  console.log(talker[0].name);
+  const searchName = talker.filter(({ name }) => name.includes(q));
+  res.status(200).json(searchName);
+});
+
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
   const talker = await readFileTalker(PATH);
@@ -37,7 +46,7 @@ app.get('/talker', async (_req, res) => {
   res.status(200).json(talker);
 });
 
-app.post('/login', validateEmail, validatePassword, (req, res) => {
+app.post('/login', validateEmail, validatePassword, (_req, res) => {
   const token = crypto.randomBytes(8).toString('hex');
   res.status(200).json({ token });
 });
