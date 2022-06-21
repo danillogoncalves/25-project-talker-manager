@@ -78,6 +78,15 @@ app.put(
 },
 );
 
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const { id } = req.params;
+  const talker = await readFileTalker(PATH);
+  const talkIndex = talker.findIndex((eTalk) => +eTalk.id === +id);
+  talker.splice(talkIndex, 1);
+  await writeFileTalker(PATH, talker);
+  res.status(204).end();
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
