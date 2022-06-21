@@ -17,6 +17,7 @@ app.use(bodyParser.json());
 
 const HTTP_OK_STATUS = 200;
 const PORT = '3000';
+const PATH = './talker.json';
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -25,14 +26,14 @@ app.get('/', (_request, response) => {
 
 app.get('/talker/:id', async (req, res) => {
   const { id } = req.params;
-  const talker = await readFileTalker('./talker.json');
-  const talk = talker.find((e) => +e.id === +id);
+  const talker = await readFileTalker(PATH);
+  const talk = talker.find((eTalk) => +eTalk.id === +id);
   if (!talk) return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   res.status(200).json(talk);
 });
 
 app.get('/talker', async (_req, res) => {
-  const talker = await readFileTalker('./talker.json');
+  const talker = await readFileTalker(PATH);
   res.status(200).json(talker);
 });
 
@@ -50,11 +51,30 @@ app.post(
   validateTalkWatchedAt,
   validateTalkRate,
   async (req, res) => {
-    const talker = await readFileTalker('./talker.json');
+    const talker = await readFileTalker(PATH);
     const newTalk = { ...req.body, id: talker.length + 1 };
     const newList = [...talker, newTalk];
-    await writeFileTalker('./talker.json', newList);
+    await writeFileTalker(PATH, newList);
   res.status(201).json(newTalk);
+},
+);
+
+app.put(
+  '/talker/:id',
+  validateToken,
+  validadeName,
+  validateAge,
+  validateTalk,
+  validateTalkWatchedAt,
+  validateTalkRate,
+  async (req, res) => {
+    const { id } = req.params;
+    const editedTalk = { id: Number(id), ...req.body };
+    const talker = await readFileTalker(PATH);
+    const talkIndex = talker.findIndex((eTalk) => +eTalk.id === +id);
+    talker[talkIndex] = editedTalk;
+    await writeFileTalker(PATH, talker);
+  res.status(200).json(editedTalk);
 },
 );
 
